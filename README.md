@@ -131,16 +131,9 @@ RBFSS/
 
 ---
 
-## Documentation
-
-A full technical walkthrough including architecture diagrams, flowcharts, and tech stack rationale is in [`docs/project-explanation.html`](docs/project-explanation.html) — open in any browser, then `Ctrl+P` → Save as PDF.
-
----
 
 ## Submitted By
-
-- **Kirti Kolare** (Roll No. A-22)
-- **Pratik Patil** (Roll No. A-25)
+- Kirti Kolare
 
 **Submitted to**: School of Information Technology, Indira University
 **Academic Year**: 2025-2026
