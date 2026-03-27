@@ -1,0 +1,210 @@
+/* ── Base ── */
+html {
+  font-size: 14px;
+  position: relative;
+  min-height: 100%;
+}
+
+@media (min-width: 768px) {
+  html { font-size: 16px; }
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7fb;
+  color: #0a0f1e;
+}
+
+/* ── Navbar ── */
+
+.navbar {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #4fa3ff !important;
+}
+
+.navbar-dark .nav-link,
+.navbar-dark .nav-link:focus {
+  font-weight: 500;
+  color: #fff !important;
+  opacity: 1 !important;
+  transition: color 0.2s;
+}
+
+.navbar-dark .nav-link:hover {
+  color: #4fa3ff !important;
+}
+
+.dropdown-menu {
+  background-color: #0d2f6e;
+  border: 1px solid #1a4fa0;
+}
+
+.dropdown-item {
+  color: #e0eaff;
+}
+
+.dropdown-item:hover {
+  background-color: #1a4fa0;
+  color: #fff;
+}
+
+.dropdown-divider {
+  border-color: #1a4fa0;
+}
+
+/* ── Buttons ── */
+.btn {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: #0d47a1;
+  border-color: #0d47a1;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #0a2f6e;
+  border-color: #0a2f6e;
+}
+
+.btn-outline-primary {
+  color: #0d47a1;
+  border-color: #0d47a1;
+}
+
+.btn-outline-primary:hover {
+  background-color: #0d47a1;
+  color: #fff;
+}
+
+.btn:focus, .btn:active:focus,
+.form-control:focus,
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem #fff, 0 0 0 0.25rem #4fa3ff;
+}
+
+/* ── Cards ── */
+.card {
+  border: 1px solid #c9d8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 1px 6px rgba(13, 47, 110, 0.07);
+}
+
+.card-header {
+  background: linear-gradient(90deg, #0d2f6e 0%, #1a4fa0 100%);
+  color: #fff;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0 !important;
+}
+
+.card-header h4,
+.card-header h5,
+.card-header h6 {
+  color: #fff;
+}
+
+/* ── Tables ── */
+.table {
+  border: 1px solid #c9d8f0;
+  background: #fff;
+}
+
+.table th {
+  background-color: #0d2f6e;
+  color: #fff;
+  border-bottom: 2px solid #1a4fa0;
+  font-weight: 600;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > td {
+  background-color: #f0f5ff;
+}
+
+.table td {
+  color: #0a0f1e;
+}
+
+.table-responsive {
+  border-radius: 8px;
+}
+
+/* ── Forms ── */
+.form-control:focus {
+  border-color: #1a4fa0;
+  box-shadow: 0 0 0 0.2rem rgba(13, 71, 161, 0.2);
+}
+
+.form-check-input:checked {
+  background-color: #0d47a1;
+  border-color: #0d47a1;
+}
+
+.form-label {
+  color: #0a0f1e;
+}
+
+/* ── Alerts ── */
+.alert {
+  border-radius: 8px;
+}
+
+.alert-info {
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+  color: #1e3a8a;
+}
+
+/* ── Badges ── */
+.badge {
+  font-size: 0.75em;
+  font-weight: 500;
+}
+
+/* ── Dashboard cards ── */
+.dashboard-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(13, 47, 110, 0.15);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .table-responsive { font-size: 0.875rem; }
+  .btn-group .btn   { font-size: 0.875rem; }
+}
+
+/* ── Home / landing page hero ── */
+.hero-card {
+  background: linear-gradient(135deg, #0a0f1e 0%, #0d2f6e 60%, #1a4fa0 100%);
+  color: #fff;
+  border-radius: 14px;
+  padding: 3rem;
+}
+
+.hero-card h1 { color: #fff; }
+.hero-card p  { color: #c9d8f0; }
+
+/* ── Feature mini-cards on landing ── */
+.feature-card {
+  border: 1px solid #c9d8f0;
+  border-radius: 10px;
+  background: #fff;
+  padding: 1.5rem;
+  text-align: left;
+  height: 100%;
+}
+
+.feature-card h5 { color: #0d2f6e; font-weight: 600; }
+.feature-card p  { color: #4a5568; font-size: 0.9rem; }

@@ -1,0 +1,92 @@
+@model IEnumerable<UploadedFile>
+@{
+    ViewData["Title"] = "All Files";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>All Files</h2>
+    <span class="text-muted">@Model.Count() file(s) total</span>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Uploaded By</th>
+                    <th>Size</th>
+                    <th>Type</th>
+                    <th>Uploaded At</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var file in Model)
+                {
+                    <tr>
+                        <td>
+                            <i class="bi bi-file-earmark"></i>
+                            @file.FileName
+                        </td>
+                        <td>
+                            @if (file.UploadedBy != null)
+                            {
+                                @($"{file.UploadedBy.FirstName} {file.UploadedBy.LastName}")
+                            }
+                            else
+                            {
+                                <span class="text-muted">Unknown</span>
+                            }
+                        </td>
+                        <td>
+                            @{
+                                var sizeKb = Math.Round(file.FileSize / 1024.0, 1);
+                                var sizeMb = Math.Round(file.FileSize / (1024.0 * 1024.0), 2);
+                            }
+                            @(sizeMb >= 1 ? $"{sizeMb} MB" : $"{sizeKb} KB")
+                        </td>
+                        <td><span class="badge bg-secondary">@file.FileType.Split('/').Last()</span></td>
+                        <td>@file.UploadedAt.ToLocalTime().ToString("MM/dd/yyyy HH:mm")</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(file.Description))
+                            {
+                                @(file.Description.Length > 40 ? file.Description.Substring(0, 40) + "..." : file.Description)
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td>
+                            <form asp-action="DeleteFile" method="post" class="d-inline">
+                                <input type="hidden" name="fileId" value="@file.FileId" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Delete this file permanently?')">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <h5>No Files Found</h5>
+        <p class="mb-0">No files have been uploaded to the system yet.</p>
+    </div>
+}

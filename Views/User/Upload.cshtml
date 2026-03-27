@@ -1,0 +1,68 @@
+@model FileUploadDto
+@{
+    ViewData["Title"] = "Upload File";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Upload File</h4>
+            </div>
+            <div class="card-body">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                <form asp-action="Upload" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">File <span class="text-danger">*</span></label>
+                        <input type="file" name="File" class="form-control" required
+                               accept=".pdf,.doc,.docx,.txt,.jpg,.png,.gif" />
+                        <div class="form-text">Allowed: PDF, DOC, DOCX, TXT, JPG, PNG, GIF — Max 10 MB</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Description" class="form-label fw-semibold">Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Optional description..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Save to Folder (optional)</label>
+                        <select name="FolderId" class="form-select">
+                            <option value="">— Root (no folder) —</option>
+                            @foreach (var folder in (ViewBag.Folders as IEnumerable<RBFSS.Models.Folder> ?? new List<RBFSS.Models.Folder>()))
+                            {
+                                <option value="@folder.FolderId">@folder.FolderName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="text-muted">Your permissions</h6>
+                <ul class="mb-0 small">
+                    <li>You can <strong>upload</strong> files</li>
+                    <li>You can <strong>download</strong> and <strong>delete</strong> your own uploaded files</li>
+                    <li>You can <strong>read/download</strong> files shared with you by managers or admins</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

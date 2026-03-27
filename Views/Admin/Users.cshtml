@@ -1,0 +1,108 @@
+@model IEnumerable<UserManagementDto>
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>User Management</h2>
+    <a asp-action="CreateUser" class="btn btn-primary">Add New User</a>
+</div>
+
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.FirstName @user.LastName</td>
+                        <td>@user.Email</td>
+                        <td>
+                            @if (user.Roles.Any())
+                            {
+                                @foreach (var role in user.Roles)
+                                {
+                                    <span class="badge bg-@(role == "Admin" ? "danger" : role == "Manager" ? "warning" : "secondary")">@role</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">No roles</span>
+                            }
+                        </td>
+                        <td>
+                            @if (user.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Inactive</span>
+                            }
+                        </td>
+                        <td>@user.CreatedAt.ToString("MM/dd/yyyy")</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Actions
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <form asp-action="AssignRole" method="post" class="d-inline">
+                                            <input type="hidden" name="userId" value="@user.UserId" />
+                                            <input type="hidden" name="roleName" value="Admin" />
+                                            <button type="submit" class="dropdown-item">Make Admin</button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form asp-action="AssignRole" method="post" class="d-inline">
+                                            <input type="hidden" name="userId" value="@user.UserId" />
+                                            <input type="hidden" name="roleName" value="Manager" />
+                                            <button type="submit" class="dropdown-item">Make Manager</button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form asp-action="AssignRole" method="post" class="d-inline">
+                                            <input type="hidden" name="userId" value="@user.UserId" />
+                                            <input type="hidden" name="roleName" value="User" />
+                                            <button type="submit" class="dropdown-item">Make User</button>
+                                        </form>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    @if (user.IsActive)
+                                    {
+                                        <li>
+                                            <form asp-action="DeactivateUser" method="post" class="d-inline">
+                                                <input type="hidden" name="userId" value="@user.UserId" />
+                                                <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Deactivate this user?')">Deactivate</button>
+                                            </form>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <h4>No Users Found</h4>
+        <p>There are no users in the system.</p>
+        <a asp-action="CreateUser" class="btn btn-primary">Add the first user</a>
+    </div>
+}

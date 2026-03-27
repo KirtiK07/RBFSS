@@ -1,0 +1,64 @@
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="hero-card text-center shadow-lg mb-4">
+            <h1 class="display-5 fw-bold mb-3">Role-Based File Sharing System</h1>
+            <p class="lead mb-4">Secure file sharing with granular, role-based access control</p>
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="alert alert-info mt-3">
+                    <h5 class="mb-1">Welcome back, @User.Identity.Name!</h5>
+                    <p class="mb-0">Signed in as: <strong>@(User.IsInRole("Admin") ? "Administrator" : User.IsInRole("Manager") ? "Manager" : "User")</strong></p>
+                </div>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Admin" asp-action="Index" class="btn btn-light btn-lg me-2 mt-2">Go to Dashboard</a>
+                }
+                else if (User.IsInRole("Manager"))
+                {
+                    <a asp-controller="Manager" asp-action="Index" class="btn btn-light btn-lg me-2 mt-2">My Files</a>
+                    <a asp-controller="Manager" asp-action="Upload" class="btn btn-outline-light btn-lg mt-2">Upload File</a>
+                }
+                else
+                {
+                    <a asp-controller="User" asp-action="Index" class="btn btn-light btn-lg me-2 mt-2">My Files</a>
+                    <a asp-controller="User" asp-action="Upload" class="btn btn-outline-light btn-lg mt-2">Upload File</a>
+                }
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="btn btn-light btn-lg me-2 mt-2">Login</a>
+                <a asp-controller="Account" asp-action="Register" class="btn btn-outline-light btn-lg mt-2">Register</a>
+            }
+        </div>
+
+        @if (User.Identity?.IsAuthenticated != true)
+        {
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <h5>🔐 Secure Access</h5>
+                        <p>Role-based authentication ensures only authorised users can view or modify files.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <h5>📁 File Management</h5>
+                        <p>Upload, download, edit, and organise files inside a structured folder hierarchy.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <h5>📋 Audit Logs</h5>
+                        <p>Every action is recorded so administrators have full visibility over file activity.</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,179 @@
+@model FolderBrowserViewModel
+@{
+    ViewData["Title"] = Model.CurrentFolder != null ? Model.CurrentFolder.FolderName : "File Browser";
+    var isAdminOrManager = User.IsInRole("Admin") || User.IsInRole("Manager");
+    var isAdmin = User.IsInRole("Admin");
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>
+        @if (Model.CurrentFolder != null)
+        {
+            <span>📁 @Model.CurrentFolder.FolderName</span>
+        }
+        else
+        {
+            <span>📂 File Browser</span>
+        }
+    </h2>
+    @if (isAdminOrManager)
+    {
+        <a asp-action="Create" asp-route-parentFolderId="@Model.CurrentFolder?.FolderId"
+           class="btn btn-outline-primary btn-sm">+ New Folder</a>
+    }
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">@TempData["Success"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">@TempData["Error"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+}
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-action="Index" asp-route-folderId="">Root</a>
+        </li>
+        @foreach (var crumb in Model.BreadcrumbPath)
+        {
+            if (crumb.FolderId == Model.CurrentFolder?.FolderId)
+            {
+                <li class="breadcrumb-item active">@crumb.FolderName</li>
+            }
+            else
+            {
+                <li class="breadcrumb-item">
+                    <a asp-action="Index" asp-route-folderId="@crumb.FolderId">@crumb.FolderName</a>
+                </li>
+            }
+        }
+    </ol>
+</nav>
+
+<!-- Subfolders -->
+@if (Model.SubFolders.Any())
+{
+    <div class="mb-4">
+        <h6 class="text-muted text-uppercase fw-semibold mb-2" style="font-size:0.75rem;">Folders</h6>
+        <div class="row g-2">
+            @foreach (var folder in Model.SubFolders)
+            {
+                <div class="col-md-3 col-sm-4 col-6">
+                    <div class="card h-100 border">
+                        <div class="card-body p-2 d-flex align-items-center gap-2">
+                            <span style="font-size:1.5rem;">📁</span>
+                            <div class="flex-grow-1 overflow-hidden">
+                                <a asp-action="Index" asp-route-folderId="@folder.FolderId"
+                                   class="text-decoration-none fw-semibold text-truncate d-block">
+                                    @folder.FolderName
+                                </a>
+                                <small class="text-muted">@folder.CreatedAt.ToLocalTime().ToString("MM/dd/yyyy")</small>
+                            </div>
+                            @if (isAdminOrManager && (isAdmin || folder.CreatedById == userId))
+                            {
+                                <form asp-action="Delete" method="post" class="d-inline">
+                                    <input type="hidden" name="folderId" value="@folder.FolderId" />
+                                    <button type="submit" class="btn btn-link btn-sm text-danger p-0"
+                                            onclick="return confirm('Delete folder?')" title="Delete">✕</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<!-- Files -->
+<div>
+    <h6 class="text-muted text-uppercase fw-semibold mb-2" style="font-size:0.75rem;">Files</h6>
+    @if (Model.Files.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Owner</th>
+                        <th>Size</th>
+                        <th>Modified</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var file in Model.Files)
+                    {
+                        var isOwner = file.UploadedById == userId;
+                        var canEditFile = isAdmin || isOwner;
+                        var canDeleteFile = isAdmin || isOwner;
+                        <tr>
+                            <td>
+                                <span>📄</span> @file.FileName
+                                @if (!string.IsNullOrEmpty(file.Description))
+                                {
+                                    <br><small class="text-muted">@file.Description</small>
+                                }
+                            </td>
+                            <td>
+                                @if (file.UploadedBy != null)
+                                { @($"{file.UploadedBy.FirstName} {file.UploadedBy.LastName}") }
+                            </td>
+                            <td>@FormatSize(file.FileSize)</td>
+                            <td>@(file.LastModified?.ToLocalTime().ToString("MM/dd/yy") ?? file.UploadedAt.ToLocalTime().ToString("MM/dd/yy"))</td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                    {
+                                        <a asp-controller="Manager" asp-action="Download" asp-route-id="@file.FileId"
+                                           class="btn btn-sm btn-outline-primary">↓</a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="User" asp-action="Download" asp-route-id="@file.FileId"
+                                           class="btn btn-sm btn-outline-primary">↓</a>
+                                    }
+                                    @if (canEditFile)
+                                    {
+                                        <a asp-controller="File" asp-action="Edit" asp-route-id="@file.FileId"
+                                           asp-route-returnUrl="/Folder/Index?folderId=@Model.CurrentFolder?.FolderId"
+                                           class="btn btn-sm btn-outline-secondary">✏</a>
+                                    }
+                                    @if (canDeleteFile)
+                                    {
+                                        <form asp-controller="@(User.IsInRole("Admin") ? "Admin" : User.IsInRole("Manager") ? "Manager" : "User")"
+                                              asp-action="DeleteFile" method="post" class="d-inline">
+                                            <input type="hidden" name="fileId" value="@file.FileId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('Delete this file?')">🗑</button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="text-muted py-3 text-center border rounded">
+            This folder is empty.
+        </div>
+    }
+</div>
+
+@functions {
+    private string FormatSize(long bytes)
+    {
+        if (bytes >= 1024 * 1024) return $"{Math.Round(bytes / (1024.0 * 1024.0), 1)} MB";
+        if (bytes >= 1024) return $"{Math.Round(bytes / 1024.0, 1)} KB";
+        return $"{bytes} B";
+    }
+}

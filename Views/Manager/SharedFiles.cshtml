@@ -1,0 +1,89 @@
+@model IEnumerable<UploadedFile>
+@{
+    ViewData["Title"] = "Shared Files";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Shared Files</h2>
+    <a asp-action="Upload" class="btn btn-primary">Upload New File</a>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Index">All Files</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-action="MyFiles">My Files</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" asp-action="SharedFiles">Shared Files</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Uploaded By</th>
+                    <th>Size</th>
+                    <th>Upload Date</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var file in Model)
+                {
+                    <tr>
+                        <td>@file.FileName</td>
+                        <td>
+                            @if (file.UploadedBy != null)
+                            {
+                                @($"{file.UploadedBy.FirstName} {file.UploadedBy.LastName}")
+                            }
+                            else
+                            {
+                                <span class="text-muted">Unknown</span>
+                            }
+                        </td>
+                        <td>
+                            @{
+                                var sizeKb = Math.Round(file.FileSize / 1024.0, 1);
+                                var sizeMb = Math.Round(file.FileSize / (1024.0 * 1024.0), 2);
+                            }
+                            @(sizeMb >= 1 ? $"{sizeMb} MB" : $"{sizeKb} KB")
+                        </td>
+                        <td>@file.UploadedAt.ToLocalTime().ToString("MM/dd/yyyy HH:mm")</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(file.Description))
+                            {
+                                @(file.Description.Length > 50 ? file.Description.Substring(0, 50) + "..." : file.Description)
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Download" asp-route-id="@file.FileId" class="btn btn-sm btn-outline-primary">Download</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <h5>No Shared Files</h5>
+        <p class="mb-0">No files have been shared with you yet.</p>
+    </div>
+}

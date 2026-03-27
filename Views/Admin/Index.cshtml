@@ -1,0 +1,101 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2>Admin Dashboard</h2>
+
+<div class="row g-4 mb-4">
+    <!-- User Statistics -->
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-primary">Total Users</h5>
+                <h3 class="display-6">@Model.UserStatistics.GetValueOrDefault("TotalUsers", 0)</h3>
+                <small class="text-muted">Active: @Model.UserStatistics.GetValueOrDefault("ActiveUsers", 0)</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Statistics -->
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-success">Total Files</h5>
+                <h3 class="display-6">@Model.FileStatistics.GetValueOrDefault("TotalFiles", 0)</h3>
+                <small class="text-muted">@Model.FileStatistics.GetValueOrDefault("TotalSizeMB", 0) MB</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audit Statistics -->
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-warning">Audit Logs</h5>
+                <h3 class="display-6">@Model.AuditStatistics.GetValueOrDefault("TotalLogs", 0)</h3>
+                <small class="text-muted">Total recorded</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Quick Actions</h5>
+                <a asp-action="CreateUser" class="btn btn-sm btn-primary">Add User</a>
+                <a asp-action="Users" class="btn btn-sm btn-outline-primary">Manage Users</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Activity -->
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentAuditLogs.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Resource</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var log in Model.RecentAuditLogs)
+                                {
+                                    <tr>
+                                        <td>@log.Timestamp.ToString("MM/dd HH:mm")</td>
+                                        <td>@log.User.FirstName @log.User.LastName</td>
+                                        <td><span class="badge bg-secondary">@log.Action</span></td>
+                                        <td>@log.Resource</td>
+                                        <td>@(log.Details.Length > 50 ? log.Details.Substring(0, 50) + "..." : log.Details)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No recent activity</p>
+                }
+
+                <div class="text-center mt-3">
+                    <a asp-action="AuditLogs" class="btn btn-outline-primary">View All Logs</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

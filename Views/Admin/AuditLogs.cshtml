@@ -1,0 +1,83 @@
+@model IEnumerable<AuditLog>
+@{
+    ViewData["Title"] = "Audit Logs";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Audit Logs</h2>
+    <span class="text-muted">@Model.Count() entries</span>
+</div>
+
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Resource</th>
+                    <th>IP Address</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model)
+                {
+                    <tr>
+                        <td class="text-nowrap">@log.Timestamp.ToLocalTime().ToString("MM/dd/yyyy HH:mm:ss")</td>
+                        <td>
+                            @if (log.User != null)
+                            {
+                                @($"{log.User.FirstName} {log.User.LastName}")
+                            }
+                            else
+                            {
+                                <span class="text-muted">Unknown</span>
+                            }
+                        </td>
+                        <td>
+                            @{
+                                var badgeColor = log.Action switch
+                                {
+                                    "LOGIN" => "success",
+                                    "LOGOUT" => "secondary",
+                                    "UPLOAD_FILE" => "primary",
+                                    "DOWNLOAD_FILE" => "info",
+                                    "DELETE_FILE" => "danger",
+                                    "CREATE_USER" => "warning",
+                                    "ASSIGN_ROLE" => "warning",
+                                    "DEACTIVATE_USER" => "danger",
+                                    _ => "secondary"
+                                };
+                            }
+                            <span class="badge bg-@badgeColor">@log.Action</span>
+                        </td>
+                        <td>
+                            @(log.Resource.Length > 50 ? log.Resource.Substring(0, 50) + "..." : log.Resource)
+                        </td>
+                        <td><code>@log.IpAddress</code></td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(log.Details))
+                            {
+                                @(log.Details.Length > 60 ? log.Details.Substring(0, 60) + "..." : log.Details)
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <h5>No Audit Logs</h5>
+        <p class="mb-0">No activity has been recorded yet.</p>
+    </div>
+}

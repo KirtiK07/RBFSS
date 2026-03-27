@@ -1,0 +1,107 @@
+@model IEnumerable<UploadedFile>
+@{
+    ViewData["Title"] = "My Files - Manager";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>File Manager</h2>
+    <a asp-action="Upload" class="btn btn-primary">Upload New File</a>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">All Files</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" asp-action="MyFiles">My Files</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" asp-action="SharedFiles">Shared Files</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="all" role="tabpanel">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>File Name</th>
+                            <th>Uploaded By</th>
+                            <th>Size</th>
+                            <th>Upload Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var file in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <i class="@GetFileIcon(file.FileType)"></i>
+                                    @file.FileName
+                                    @if (!string.IsNullOrEmpty(file.Description))
+                                    {
+                                        <br><small class="text-muted">@file.Description</small>
+                                    }
+                                </td>
+                                <td>@file.UploadedBy.FirstName @file.UploadedBy.LastName</td>
+                                <td>@FormatFileSize(file.FileSize)</td>
+                                <td>@file.UploadedAt.ToString("MM/dd/yyyy HH:mm")</td>
+                                <td>
+                                    <a asp-action="Download" asp-route-id="@file.FileId" class="btn btn-sm btn-outline-primary">
+                                        Download
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <h4>No Files Available</h4>
+                <p>There are no files in the system yet.</p>
+                <a asp-action="Upload" class="btn btn-primary">Upload the first file</a>
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+    private string GetFileIcon(string fileType)
+    {
+        return fileType?.ToLower() switch
+        {
+            var t when t.Contains("pdf") => "📄",
+            var t when t.Contains("image") => "🖼️",
+            var t when t.Contains("text") => "📝",
+            var t when t.Contains("word") => "📄",
+            _ => "📁"
+        };
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        const int scale = 1024;
+        string[] orders = { "GB", "MB", "KB", "Bytes" };
+        long max = (long)Math.Pow(scale, orders.Length - 1);
+
+        foreach (string order in orders)
+        {
+            if (bytes > max)
+                return string.Format("{0:##.##} {1}", decimal.Divide(bytes, max), order);
+
+            max /= scale;
+        }
+        return "0 Bytes";
+    }
+}
